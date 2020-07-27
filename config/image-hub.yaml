@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
       - name: web
-        image: layer5/image-hub-web:latest
+        image: layer5/image-hub-web:dumb-filter
         ports:
         - containerPort: 8080
         env:
@@ -100,9 +100,9 @@ metadata:
   labels:
     app: envoy
 spec:
-  # type: LoadBalancer
+  type: LoadBalancer
   # If you are testing on Docker Desktop or Minikube
-  type: NodePort
+#  type: NodePort
   ports:
     - port: 80
       targetPort: 80

@@ -119,20 +119,10 @@ export default {
   methods: {
     pullImage: function () {
         console.log("Done!")
-        let token = localStorage.getItem("token")
-        if (token == null) {
-            this.message = "Unauthorized"
-            return
-        }
-        let userObj = JSON.parse(atob(token))
-        axios.get(this.$BASE_URL + "/pull", {
-            headers: {
-                Authorization: token
-            }
-        }).then((res) => {
-            this.message = `Hello ${userObj.username} (${userObj.plan}) !` 
+        axios.get(this.$BASE_URL + "/pull").then((res) => {
+            this.message = `Hello !` 
             
-            this.dialogTitle = `Hello ${userObj.username}!`
+            this.dialogTitle = `Hello !`
             this.dialogBody = `Image pull request in-progress...`
             this.dialog = true
             
@@ -141,7 +131,7 @@ export default {
             console.log(res)
             if (res.response != null && res.response.status == 429) {
                 this.dialogTitle = `Plan Limit Exceeded`
-                this.dialogBody = `Sorry, you have reached your daily image pull limit under your current plan (${userObj.plan}). Need more pulls today? Click below to upgrade your plan.`
+                this.dialogBody = `Sorry, you have reached your daily image pull limit under your current plan .Need more pulls today? Click below to upgrade your plan.`
                 this.dialog = true
                 this.upgradeButton = true
             } else {
