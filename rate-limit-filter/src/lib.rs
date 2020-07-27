@@ -52,15 +52,11 @@ impl HttpContext for UpstreamCall {
                 return Action::Continue;
             }
         }
-        if let Some(header) = self.get_http_request_header("Authorization") {
-            if let Ok(token) = base64::decode(header) {
-                let obj: Data = serde_json::from_slice(&token).unwrap();
-                proxy_wasm::hostcalls::log(LogLevel::Debug, format!("Obj {:?}", obj).as_str());
                 let curr = self.get_current_time();
                 let tm = curr.duration_since(SystemTime::UNIX_EPOCH).unwrap();
                 let mn = (tm.as_secs() / 60) % 60;
                 let sc = tm.as_secs() % 60;
-                let mut rl = RateLimiter::get(obj.username, obj.plan);
+                let mut rl = RateLimiter::get();
                 if !rl.update(mn as i32) {
                     self.send_http_response(429, CORS_HEADERS.to_vec(), Some(b"Limit exceeded.\n"));
                     rl.set();
@@ -69,10 +65,6 @@ impl HttpContext for UpstreamCall {
                 proxy_wasm::hostcalls::log(LogLevel::Debug, format!("Obj {:?}", &rl).as_str());
                 rl.set();
                 return Action::Continue;
-            }
-        }
-        self.send_http_response(401, CORS_HEADERS.to_vec(), Some(b"Unauthorized\n"));
-        Action::Pause
     }
 
     fn on_http_response_headers(&mut self, _num_headers: usize) -> Action {
